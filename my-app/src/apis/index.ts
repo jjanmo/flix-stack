@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   params: {
-    api_key: process.env.REACT_APP_API_KEY,
+    api_key: import.meta.env.VITE_API_KEY,
     language: 'en-US',
   },
 });
@@ -13,20 +13,20 @@ export const movieApi = {
   upcoming: () => api.get('movie/upcoming'),
   popular: () => api.get('movie/popular'),
   topRated: () => api.get('movie/top_rated'),
-  search: term =>
+  search: (term: string) =>
     api.get('search/movie', {
       params: {
         query: encodeURIComponent(term),
       },
     }),
-  getDetail: id =>
+  getDetail: (id: string) =>
     api.get(`movie/${id}`, {
       params: {
         append_to_response: 'videos,images',
       },
     }),
-  getCast: id => api.get(`/movie/${id}/credits`),
-  getCollection: id => api.get(`/collection/${id}`),
+  getCast: (id: string) => api.get(`/movie/${id}/credits`),
+  getCollection: (id: string) => api.get(`/collection/${id}`),
 };
 
 export const tvApi = {
@@ -34,21 +34,21 @@ export const tvApi = {
   popular: () => api.get('tv/popular'),
   topRated: () => api.get('tv/top_rated'),
   onTheAir: () => api.get('tv/on_the_air'),
-  search: term =>
+  search: (term: string) =>
     api.get('search/tv', {
       params: {
         query: encodeURIComponent(term),
       },
     }),
-  getDetail: id =>
+  getDetail: (id: string) =>
     api.get(`tv/${id}`, {
       params: {
         append_to_response: 'videos,images',
       },
     }),
-  getCast: id => api.get(`/tv/${id}/credits`),
-  getExternalId: id => api.get(`/tv/${id}/external_ids`),
-  getSeason: (id, seasonNumber) =>
+  getCast: (id: string) => api.get(`/tv/${id}/credits`),
+  getExternalId: (id: string) => api.get(`/tv/${id}/external_ids`),
+  getSeason: (id: string, seasonNumber: number) =>
     api.get(`/tv/${id}/season/${seasonNumber}`, {
       params: {
         append_to_response: 'videos,images',
@@ -57,7 +57,7 @@ export const tvApi = {
 };
 
 export const commonApi = {
-  getActor: id =>
+  getActor: (id: string) =>
     api.get(`/person/${id}`, {
       params: {
         append_to_response: 'videos,images',

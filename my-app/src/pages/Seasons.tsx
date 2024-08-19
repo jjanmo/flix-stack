@@ -176,9 +176,7 @@ const Seasons = () => {
             {data.seasons &&
               data.seasons.map((season, index) => (
                 <SLink
-                  to={{
-                    pathname: `/seasons/${data.id}/${season.season_number}`,
-                  }}
+                  to={`/seasons/${data.id}/${season.season_number}`}
                   key={index}
                   state={{
                     name: data.name,

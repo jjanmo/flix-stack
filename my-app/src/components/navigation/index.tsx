@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import logo from 'assets/logo_transparent.png';
+import logo from '@/assets/logo_transparent.png';
 import { Logo, Header, InnerBox, Item, SLink } from './styles';
 
 function Navigation() {

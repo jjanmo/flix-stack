@@ -6,7 +6,7 @@ const routes = {
   TV_DETAIL: '/tv/:id',
   SEARCH: '/search',
   COLLECTION: '/collection/:id',
-  SEASONS: '/season/:id',
+  SEASONS: '/seasons/:id',
   ACTOR: '/actor/:id',
   SEASON: '/seasons/:id/:season',
 } as const;

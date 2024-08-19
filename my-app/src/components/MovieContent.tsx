@@ -1,12 +1,11 @@
-import React from 'react';
 import styled from 'styled-components';
-import Genres from 'components/Genres';
-import Actors from 'components/Actors';
-import { Link } from 'react-router-dom';
-import Videos from 'components/Videos';
-import Rank from 'components/Rank';
-import { withRouter } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import Genres from '@/components/Genres';
+import Actors from '@/components/Actors';
+import { Link, useNavigate } from 'react-router-dom';
+import Videos from '@/components/Videos';
+import Rank from '@/components/Rank';
+import noPosterImage from '@/assets/no_poster.png';
+import { Movie } from '@/types';
 
 const Container = styled.div`
   display: grid;
@@ -50,12 +49,12 @@ const CollectionLink = styled(Link)`
     color: white;
   }
 `;
-const Classification = styled.div`
+const Classification = styled.div<{ genresLength: number }>`
   display: flex;
   justify-content: left;
   align-items: center;
   margin-bottom: 1rem;
-  font-size: ${props => {
+  font-size: ${(props) => {
     switch (props.genresLength) {
       case 4: {
         return '1rem';
@@ -94,14 +93,14 @@ const RightBox = styled.div`
   justify-content: center;
   align-items: center;
 `;
-const Poster = styled.div`
+const Poster = styled.div<{ posterUrl: string; isExisted: boolean }>`
   border-radius: 5px;
-  background-image: url(${props => props.posterUrl});
+  background-image: url(${(props) => props.posterUrl});
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  opacity: ${props => (props.isExisted ? 1 : 0.5)};
+  opacity: ${(props) => (props.isExisted ? 1 : 0.5)};
   @media (min-width: 1441px) {
     width: 500px;
     height: 700px;
@@ -129,9 +128,15 @@ const Button = styled.button`
   }
 `;
 
-function MovieContent({ history, movie }) {
+interface Props {
+  movie: Movie;
+}
+
+function MovieContent({ movie }: Props) {
+  const navigate = useNavigate();
+
   const handleClick = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   return (
@@ -179,12 +184,8 @@ function MovieContent({ history, movie }) {
         </LeftBox>
         <RightBox>
           <Poster
-            posterUrl={
-              movie.poster_path
-                ? `https://image.tmdb.org/t/p/w400${movie.poster_path}`
-                : require('../assets/no_poster.png')
-            }
-            isExisted={movie.poster_path && true}
+            posterUrl={movie.poster_path ? `https://image.tmdb.org/t/p/w400${movie.poster_path}` : noPosterImage}
+            isExisted={!!movie.poster_path && true}
           />
         </RightBox>
       </Container>
@@ -192,33 +193,4 @@ function MovieContent({ history, movie }) {
   );
 }
 
-MovieContent.propTypes = {
-  movie: PropTypes.shape({
-    title: PropTypes.string,
-    original_title: PropTypes.string,
-    belongs_to_collection: PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-    }),
-    release_date: PropTypes.string,
-    adult: PropTypes.bool,
-    runtime: PropTypes.number,
-    genres: PropTypes.array,
-    vote_average: PropTypes.number,
-    imdb_id: PropTypes.string,
-    overview: PropTypes.string,
-    id: PropTypes.number.isRequired,
-    videos: PropTypes.shape({
-      results: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string.isRequired,
-          key: PropTypes.string.isRequired,
-          name: PropTypes.string.isRequired,
-        })
-      ),
-    }),
-    poster_path: PropTypes.string,
-  }).isRequired,
-};
-
-export default withRouter(MovieContent);
+export default MovieContent;

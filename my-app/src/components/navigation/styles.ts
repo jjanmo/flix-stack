@@ -38,7 +38,7 @@ export const InnerBox = styled.div`
   margin: 1rem;
 `;
 
-export const Item = styled.li`
+export const Item = styled.li<{ current: boolean }>`
   list-style: none;
   width: 100%;
   &:not(:first-child) {
@@ -47,8 +47,8 @@ export const Item = styled.li`
   &:not(:last-child) {
     border-right: 1px solid rgba(0, 0, 0, 0.25);
   }
-  background-color: ${props => (props.current ? '#dce5ec' : '#3f7293')};
-  color: ${props => (props.current ? '#1e272e' : '#d9dadd')};
+  background-color: ${(props) => (props.current ? '#dce5ec' : '#3f7293')};
+  color: ${(props) => (props.current ? '#1e272e' : '#d9dadd')};
 `;
 
 export const SLink = styled(Link)`

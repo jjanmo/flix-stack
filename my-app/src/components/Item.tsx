@@ -1,8 +1,7 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Stars from 'components/Stars';
-import PropTypes from 'prop-types';
+import Stars from '@/components/Stars';
+import noPosterImage from '@/assets/no_poster.png';
 
 const PosterBox = styled.div`
   position: relative;
@@ -15,9 +14,9 @@ const PosterBox = styled.div`
     height: 250px;
   }
 `;
-const Poster = styled.div`
+const Poster = styled.div<{ posterUrl: string }>`
   border-radius: 5px;
-  background-image: url(${props => props.posterUrl});
+  background-image: url(${(props) => props.posterUrl});
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -82,32 +81,30 @@ const Container = styled.div`
   }
 `;
 
-function Item({ id, title, poster, rating, year, isMovie = false }) {
+interface Props {
+  id: number;
+  title: string;
+  poster: string;
+  rating: number;
+  year: string;
+  isMovie?: boolean;
+}
+
+function Item({ id, title, poster, rating, year, isMovie = false }: Props) {
   return (
     <Link to={isMovie ? `/movie/${id}` : `/tv/${id}`}>
       <Container>
         <PosterBox>
-          <Poster
-            posterUrl={poster ? `https://image.tmdb.org/t/p/w200/${poster}` : require('../assets/no_poster.png')}
-          />
+          <Poster posterUrl={poster ? `https://image.tmdb.org/t/p/w200/${poster}` : noPosterImage} />
         </PosterBox>
         <Title>{title}</Title>
         <ReleasedYear>{year}</ReleasedYear>
         <Rating>
-          <Stars rating={rating} full={Math.floor(rating / 2)} isNotHalf={Number.isInteger(rating)} />
+          <Stars full={Math.floor(rating / 2)} isNotHalf={Number.isInteger(rating)} />
         </Rating>
       </Container>
     </Link>
   );
 }
-
-Item.propTypes = {
-  id: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired,
-  poster: PropTypes.string,
-  rating: PropTypes.number.isRequired,
-  year: PropTypes.string,
-  isMovie: PropTypes.bool,
-};
 
 export default Item;

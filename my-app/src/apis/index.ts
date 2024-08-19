@@ -19,14 +19,14 @@ export const movieApi = {
         query: encodeURIComponent(term),
       },
     }),
-  getDetail: (id: string) =>
+  getDetail: (id: number) =>
     api.get(`movie/${id}`, {
       params: {
         append_to_response: 'videos,images',
       },
     }),
   getCast: (id: string) => api.get(`/movie/${id}/credits`),
-  getCollection: (id: string) => api.get(`/collection/${id}`),
+  getCollection: (id: number) => api.get(`/collection/${id}`),
 };
 
 export const tvApi = {
@@ -40,15 +40,15 @@ export const tvApi = {
         query: encodeURIComponent(term),
       },
     }),
-  getDetail: (id: string) =>
+  getDetail: (id: number) =>
     api.get(`tv/${id}`, {
       params: {
         append_to_response: 'videos,images',
       },
     }),
   getCast: (id: string) => api.get(`/tv/${id}/credits`),
-  getExternalId: (id: string) => api.get(`/tv/${id}/external_ids`),
-  getSeason: (id: string, seasonNumber: number) =>
+  getExternalId: (id: number) => api.get(`/tv/${id}/external_ids`),
+  getSeason: (id: number, seasonNumber: number) =>
     api.get(`/tv/${id}/season/${seasonNumber}`, {
       params: {
         append_to_response: 'videos,images',
@@ -57,7 +57,7 @@ export const tvApi = {
 };
 
 export const commonApi = {
-  getActor: (id: string) =>
+  getActor: (id: number) =>
     api.get(`/person/${id}`, {
       params: {
         append_to_response: 'videos,images',

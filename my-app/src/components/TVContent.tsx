@@ -1,12 +1,11 @@
-import React from 'react';
 import styled from 'styled-components';
-import Genres from 'components/Genres';
-import Actors from 'components/Actors';
-import { Link } from 'react-router-dom';
-import Videos from 'components/Videos';
-import Rank from 'components/Rank';
-import { withRouter } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import Genres from '@/components/Genres';
+import Actors from '@/components/Actors';
+import { Link, useNavigate } from 'react-router-dom';
+import Videos from '@/components/Videos';
+import Rank from '@/components/Rank';
+import { TV } from '@/types';
+import noPosterImage from '@/assets/no_poster.png';
 
 const Container = styled.div`
   display: grid;
@@ -50,11 +49,11 @@ const SeasonsLink = styled(Link)`
     color: white;
   }
 `;
-const Classification = styled.div`
+const Classification = styled.div<{ genresLength: number }>`
   display: flex;
   justify-content: left;
   align-items: center;
-  font-size: ${props => {
+  font-size: ${(props) => {
     switch (props.genresLength) {
       case 4: {
         return '1rem';
@@ -92,14 +91,14 @@ const RightBox = styled.div`
   justify-content: center;
   align-items: center;
 `;
-const Poster = styled.div`
+const Poster = styled.div<{ posterUrl: string; isExisted: boolean }>`
   border-radius: 5px;
-  background-image: url(${props => props.posterUrl});
+  background-image: url(${(props) => props.posterUrl});
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-  opacity: ${props => (props.isExisted ? 1 : 0.5)};
+  opacity: ${(props) => (props.isExisted ? 1 : 0.5)};
   @media (min-width: 1441px) {
     width: 500px;
     height: 700px;
@@ -127,10 +126,19 @@ const Button = styled.button`
   }
 `;
 
-function TVContent({ history, tv, imdbId }) {
+interface Props {
+  tv: TV;
+  imdbId: string;
+}
+
+function TVContent({ tv, imdbId }: Props) {
+  const navigate = useNavigate();
+
   const handleClick = () => {
-    history.goBack();
+    navigate(-1);
   };
+
+  const runtime = tv.episode_run_time?.[0];
 
   return (
     <>
@@ -141,13 +149,7 @@ function TVContent({ history, tv, imdbId }) {
             <Button onClick={handleClick}>back</Button>
           </Title>
           <SubTitle>{tv.original_name === tv.name ? '' : `( ${tv.original_name} )`}</SubTitle>
-          <Links>
-            {tv.seasons && (
-              <SeasonsLink to={`/seasons/${tv.id}`} seasons={tv.seasons}>
-                Seasons
-              </SeasonsLink>
-            )}
-          </Links>
+          <Links>{tv.seasons && <SeasonsLink to={`/seasons/${tv.id}`}>Seasons</SeasonsLink>}</Links>
           <Classification genresLength={tv.genres && tv.genres.length}>
             <Year>
               {`${tv.first_air_date ? tv.first_air_date.slice(0, 4) : 'Not Updated'} ${
@@ -156,7 +158,7 @@ function TVContent({ history, tv, imdbId }) {
               <Divider>|</Divider>
             </Year>
             <Runtime>
-              {`${tv.episode_run_time[0]} min` || 'Not Updated'}
+              {runtime || 'Not Updated'}
               <Divider>|</Divider>
             </Runtime>
             <Genres genres={tv.genres}></Genres>
@@ -174,10 +176,8 @@ function TVContent({ history, tv, imdbId }) {
         </LeftBox>
         <RightBox>
           <Poster
-            posterUrl={
-              tv.poster_path ? `https://image.tmdb.org/t/p/w400${tv.poster_path}` : require('../assets/no_poster.png')
-            }
-            isExisted={tv.poster_path && true}
+            posterUrl={tv.poster_path ? `https://image.tmdb.org/t/p/w400${tv.poster_path}` : noPosterImage}
+            isExisted={!!tv.poster_path}
           />
         </RightBox>
       </Container>
@@ -185,38 +185,4 @@ function TVContent({ history, tv, imdbId }) {
   );
 }
 
-TVContent.propTypes = {
-  tv: PropTypes.shape({
-    name: PropTypes.string,
-    original_name: PropTypes.string,
-    seasons: PropTypes.arrayOf(
-      PropTypes.shape({
-        air_date: PropTypes.string,
-        episode_count: PropTypes.number,
-        name: PropTypes.string,
-        overview: PropTypes.string,
-        poster_path: PropTypes.string,
-        season_number: PropTypes.number,
-      })
-    ),
-    first_air_date: PropTypes.string,
-    last_air_date: PropTypes.string,
-    episode_run_time: PropTypes.arrayOf(PropTypes.number),
-    vote_average: PropTypes.number,
-    vote_count: PropTypes.number,
-    overview: PropTypes.string,
-    videos: PropTypes.shape({
-      results: PropTypes.arrayOf(
-        PropTypes.shape({
-          id: PropTypes.string.isRequired,
-          key: PropTypes.string,
-          name: PropTypes.string,
-        })
-      ),
-    }),
-    poster_path: PropTypes.string,
-  }),
-  imdbId: PropTypes.string,
-};
-
-export default withRouter(TVContent);
+export default TVContent;

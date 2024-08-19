@@ -1,9 +1,10 @@
-import React from 'react';
-import { withRouter, Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import logo from 'assets/logo_transparent.png';
 import { Logo, Header, InnerBox, Item, SLink } from './styles';
 
-function Navigation({ location: { pathname } }) {
+function Navigation() {
+  const { pathname } = useLocation();
+
   return (
     <Header>
       <Link to="/">
@@ -27,4 +28,4 @@ function Navigation({ location: { pathname } }) {
   );
 }
 
-export default withRouter(Navigation);
+export default Navigation;

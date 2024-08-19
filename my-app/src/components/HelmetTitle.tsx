@@ -1,7 +1,10 @@
-import React from 'react';
 import { HelmetProvider, Helmet } from 'react-helmet-async';
 
-const HelmetTitle = ({ text, isLoading }) => {
+interface Props {
+  text: string;
+}
+
+const HelmetTitle = ({ text }: Props) => {
   return (
     <HelmetProvider>
       <Helmet>

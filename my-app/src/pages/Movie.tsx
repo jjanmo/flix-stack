@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Section from 'components/Section';
-import Loader from 'components/Loader';
-import Item from 'components/Item';
-import { movieApi } from 'api';
+import Section from '@/components/Section';
+import Loader from '@/components/Loader';
+import Item from '@/components/Item';
+import { movieApi } from '@/apis';
 import HelmetTitle from '../components/HelmetTitle';
+import { Movie as MovieType } from '@/types';
 
 const Container = styled.div``;
 
 const Movie = () => {
-  const [popular, setPopular] = useState([]);
-  const [topRated, setTopRated] = useState([]);
+  const [popular, setPopular] = useState<MovieType[]>([]);
+  const [topRated, setTopRated] = useState<MovieType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -27,8 +27,6 @@ const Movie = () => {
 
       setPopular(_popular);
       setTopRated(_topRated);
-    } catch (error) {
-      setError(error);
     } finally {
       setIsLoading(false);
     }
@@ -37,8 +35,6 @@ const Movie = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  if (error) return <div>{JSON.stringify(error)}</div>;
 
   return isLoading ? (
     <>
@@ -49,7 +45,7 @@ const Movie = () => {
     <Container>
       {popular && popular.length > 0 && (
         <Section title="Popular Movies">
-          {popular.map(movie => (
+          {popular.map((movie) => (
             <Item
               key={movie.id}
               id={movie.id}
@@ -64,7 +60,7 @@ const Movie = () => {
       )}
       {topRated && topRated.length > 0 && (
         <Section title="Top Rated Movies">
-          {topRated.map(movie => (
+          {topRated.map((movie) => (
             <Item
               key={movie.id}
               id={movie.id}

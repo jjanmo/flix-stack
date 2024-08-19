@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import HelmetTitle from '../components/HelmetTitle';
-import { Link } from 'react-router-dom';
-import { tvApi } from 'api';
-import Loader from '../components/Loader';
+import HelmetTitle from '@/components/HelmetTitle';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { tvApi } from '@/apis';
+import Loader from '@/components/Loader';
+import { TV } from '@/types';
+import noPosterImage from '@/assets/no_poster.png';
 
 const Container = styled.div`
   display: flex;
@@ -13,8 +15,8 @@ const Container = styled.div`
   width: 90%;
   margin: 1rem auto;
 `;
-const Background = styled.div`
-  background-image: url(${props => props.backdropUrl});
+const Background = styled.div<{ backdropUrl: string }>`
+  background-image: url(${(props) => props.backdropUrl});
   background-position: center center;
   background-repeat: repeat;
   background-size: cover;
@@ -60,8 +62,8 @@ const SLink = styled(Link)`
   align-items: center;
   position: relative;
 `;
-const Poster = styled.div`
-  background-image: url(${props => props.posterUrl});
+const Poster = styled.div<{ posterUrl: string; isExisted: boolean }>`
+  background-image: url(${(props) => props.posterUrl});
   background-position: center center;
   background-repeat: repeat;
   background-size: cover;
@@ -70,7 +72,7 @@ const Poster = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: ${props => (props.isExisted ? 1 : 0.7)};
+  opacity: ${(props) => (props.isExisted ? 1 : 0.7)};
 `;
 const TopBox = styled.div`
   background-color: rgba(0, 0, 0, 0.3);
@@ -124,34 +126,30 @@ const Button = styled.button`
   }
 `;
 
-const Seasons = ({ history, match }) => {
-  const [data, setData] = useState(null);
+const Seasons = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [data, setData] = useState<TV | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleClick = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   const fetchData = useCallback(async () => {
-    const id = match.params.id;
     setIsLoading(true);
-
     try {
-      const { data } = await tvApi.getDetail(id);
+      const { data } = await tvApi.getDetail(Number(id));
       setData(data);
-    } catch (e) {
-      setError(e);
     } finally {
       setIsLoading(false);
     }
-  }, [match]);
+  }, [id]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  if (error) return <div>{JSON.stringify(error)}</div>;
 
   return isLoading ? (
     <>
@@ -180,13 +178,13 @@ const Seasons = ({ history, match }) => {
                 <SLink
                   to={{
                     pathname: `/seasons/${data.id}/${season.season_number}`,
-                    state: {
-                      name: data.name,
-                      originalName: data.original_name,
-                      backdropUrl: data.backdrop_path ? `https://image.tmdb.org/t/p/w1280/${data.backdrop_path}` : '',
-                    },
                   }}
                   key={index}
+                  state={{
+                    name: data.name,
+                    originalName: data.original_name,
+                    backdropUrl: data.backdrop_path ? `https://image.tmdb.org/t/p/w1280/${data.backdrop_path}` : '',
+                  }}
                 >
                   <TopBox>
                     <Name>{season.name}</Name>
@@ -198,11 +196,9 @@ const Seasons = ({ history, match }) => {
                   <Item>
                     <Poster
                       posterUrl={
-                        season.poster_path
-                          ? `https://image.tmdb.org/t/p/w200${season.poster_path}`
-                          : require('../assets/no_poster.png')
+                        season.poster_path ? `https://image.tmdb.org/t/p/w200${season.poster_path}` : noPosterImage
                       }
-                      isExisted={season.poster_path && true}
+                      isExisted={!!season.poster_path}
                     />
                   </Item>
                 </SLink>

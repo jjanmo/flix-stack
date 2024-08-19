@@ -1,16 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { movieApi, tvApi } from 'api';
+import { useState, useEffect, useCallback } from 'react';
+import { movieApi, tvApi } from '@/apis';
 import styled from 'styled-components';
-import HelmetTitle from 'components/HelmetTitle';
-import MovieContent from 'components/MovieContent';
-import TVContent from 'components/TVContent';
-import Loader from 'components/Loader';
+import HelmetTitle from '@/components/HelmetTitle';
+import MovieContent from '@/components/MovieContent';
+import TVContent from '@/components/TVContent';
+import Loader from '@/components/Loader';
+import { Movie, TV } from '@/types';
+import { useLocation, useParams } from 'react-router-dom';
 
 const Container = styled.div`
   width: 100%;
 `;
-const Background = styled.div`
-  background-image: url(${props => props.backdropUrl});
+const Background = styled.div<{ backdropUrl: string }>`
+  background-image: url(${(props) => props.backdropUrl});
   background-position: center center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -24,43 +26,38 @@ const Background = styled.div`
   opacity: 0.6;
 `;
 
-const Detail = ({ location, match }) => {
-  const [movie, setMovie] = useState(null);
-  const [tv, setTV] = useState(null);
+const Detail = () => {
+  const { id } = useParams();
+  const { pathname } = useLocation();
+
+  const [movie, setMovie] = useState<Movie>();
+  const [tv, setTV] = useState<TV>();
   const [isLoading, setIsLoading] = useState(false);
-  const [imdbId, setImdbId] = useState(null);
-  const [error, setError] = useState(null);
+  const [imdbId, setImdbId] = useState<string>('');
 
   const fetchData = useCallback(async () => {
-    const _id = match.params.id;
-    const path = location.pathname;
     setIsLoading(true);
 
     try {
-      if (path.includes('movie')) {
-        const { data } = await movieApi.getDetail(_id);
+      if (pathname.includes('movie')) {
+        const { data } = await movieApi.getDetail(Number(id));
         setMovie(data);
       } else {
-        console.log();
-        const { data } = await tvApi.getDetail(_id);
+        const { data } = await tvApi.getDetail(Number(id));
         const {
           data: { imdb_id },
-        } = await tvApi.getExternalId(_id);
+        } = await tvApi.getExternalId(Number(id));
         setTV(data);
         setImdbId(imdb_id);
       }
-    } catch (error) {
-      setError(error);
     } finally {
       setIsLoading(false);
     }
-  }, [location, match]);
+  }, [id, pathname]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  if (error) return <div>{JSON.stringify(error)}</div>;
 
   return isLoading ? (
     <>

@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import Section from 'components/Section';
-import Loader from 'components/Loader';
-import Item from 'components/Item';
-import { movieApi, tvApi } from 'api';
+import Section from '@/components/Section';
+import Loader from '@/components/Loader';
+import Item from '@/components/Item';
+import { movieApi, tvApi } from '@/apis';
 import HelmetTitle from '../components/HelmetTitle';
+import { Movie, TV } from '@/types';
 
 const Container = styled.div``;
 
 const Home = () => {
-  const [nowPlaying, setNowPlaying] = useState([]);
-  const [upcoming, setUpcoming] = useState([]);
-  const [airingToday, setAiringToday] = useState([]);
+  const [nowPlaying, setNowPlaying] = useState<Movie[]>([]);
+  const [upcoming, setUpcoming] = useState<Movie[]>([]);
+  const [airingToday, setAiringToday] = useState<TV[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -34,8 +34,6 @@ const Home = () => {
       setNowPlaying(_nowPlaying);
       setUpcoming(_upcoming);
       setAiringToday(_airingToday);
-    } catch (error) {
-      setError(error);
     } finally {
       setIsLoading(false);
     }
@@ -44,8 +42,6 @@ const Home = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  if (error) return <div>{JSON.stringify(error)}</div>;
 
   return isLoading ? (
     <>
@@ -57,7 +53,7 @@ const Home = () => {
       <HelmetTitle text="Home" />
       {nowPlaying && nowPlaying.length > 0 && (
         <Section title="Now Playing Movies">
-          {nowPlaying.map(movie => (
+          {nowPlaying.map((movie) => (
             <Item
               key={movie.id}
               id={movie.id}
@@ -72,7 +68,7 @@ const Home = () => {
       )}
       {upcoming && upcoming.length > 0 && (
         <Section title="Upcoming Movies">
-          {upcoming.map(movie => (
+          {upcoming.map((movie) => (
             <Item
               key={movie.id}
               id={movie.id}
@@ -87,7 +83,7 @@ const Home = () => {
       )}
       {airingToday && airingToday.length > 0 && (
         <Section title="Today Airing TVs">
-          {airingToday.map(tv => (
+          {airingToday.map((tv) => (
             <Item
               key={tv.id}
               id={tv.id}

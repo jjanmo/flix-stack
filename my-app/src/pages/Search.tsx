@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import { movieApi, tvApi } from 'api';
+import { movieApi, tvApi } from '@/apis';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import HelmetTitle from 'components/HelmetTitle';
-import Loader from 'components/Loader';
-import Section from 'components/Section';
-import Item from 'components/Item';
+import HelmetTitle from '@/components/HelmetTitle';
+import Loader from '@/components/Loader';
+import Section from '@/components/Section';
+import Item from '@/components/Item';
+import { Movie, TV } from '@/types';
 
 const Form = styled.form`
   width: 100%;
@@ -73,11 +74,10 @@ const SearchTerm = styled.span`
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [movies, setMovies] = useState([]);
-  const [TVs, setTVs] = useState([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [TVs, setTVs] = useState<TV[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -86,33 +86,29 @@ const Search = () => {
       const { data: tData } = await tvApi.search(searchTerm);
       setMovies(mData.results);
       setTVs(tData.results);
-    } catch (error) {
-      setError(error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleChange = e => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { target } = e;
     if (movies.length === 0 && TVs.length === 0) setIsSubmitted(false);
     setSearchTerm(target.value);
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchTerm !== '') {
-      fetchData(searchTerm);
+      fetchData();
     }
     setIsSubmitted(true);
   };
 
-  if (error) return <div>{JSON.stringify(error)}</div>;
-
   return (
     <>
       <Form onSubmit={handleSubmit}>
-        <Input placeholder="search" autocomplete="off" onChange={handleChange} maxLength="40" />
+        <Input placeholder="search" onChange={handleChange} maxLength={40} autoComplete="off" />
         <Button>
           <FontAwesomeIcon icon={faSearch} size="2x" />
         </Button>
@@ -128,7 +124,7 @@ const Search = () => {
 
           {movies && movies.length > 0 && (
             <Section title="Movies">
-              {movies.map(movie => (
+              {movies.map((movie) => (
                 <Item
                   key={movie.id}
                   id={movie.id}
@@ -143,7 +139,7 @@ const Search = () => {
           )}
           {TVs && TVs.length > 0 && (
             <Section title="TVs">
-              {TVs.map(tv => (
+              {TVs.map((tv) => (
                 <Item
                   key={tv.id}
                   id={tv.id}

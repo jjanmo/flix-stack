@@ -1,8 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
-import { commonApi } from 'api';
+import { commonApi } from '@/apis';
 import HelmetTitle from '../components/HelmetTitle';
-import Loader from 'components/Loader';
+import Loader from '@/components/Loader';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Actor as ActorType } from '@/types';
+import noPosterImage from '@/assets/no_poster.png';
 
 const ActorContainer = styled.div`
   width: 70%;
@@ -29,14 +32,14 @@ const RightBox = styled.div`
   flex-direction: column;
   align-items: left;
 `;
-const Profile = styled.div`
+const Profile = styled.div<{ profileUrl: string; isExisted: boolean }>`
   grid-column: 1;
-  background-image: url(${props => props.profileUrl});
+  background-image: url(${(props) => props.profileUrl});
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   border-radius: 5px;
-  opacity: ${props => (props.isExisted ? 1 : 0.5)};
+  opacity: ${(props) => (props.isExisted ? 1 : 0.5)};
   @media screen and (max-width: 1440px) {
     width: 280px;
     height: 380px;
@@ -104,33 +107,30 @@ const Button = styled.button`
   }
 `;
 
-const Actor = ({ match, history }) => {
-  const [actor, setActor] = useState(null);
+const Actor = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [actor, setActor] = useState<ActorType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const fetchData = useCallback(async () => {
-    const id = match.params.id;
     setIsLoading(true);
     try {
-      const { data } = await commonApi.getActor(id);
+      const { data } = await commonApi.getActor(Number(id));
       setActor(data);
-    } catch (error) {
-      setError(error);
     } finally {
       setIsLoading(false);
     }
-  }, [match]);
+  }, [id]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const handleCloseClick = () => {
-    history.goBack();
+    navigate(-1);
   };
-
-  if (error) return <div>{JSON.stringify(error)}</div>;
 
   return isLoading ? (
     <>
@@ -145,12 +145,8 @@ const Actor = ({ match, history }) => {
           <Button onClick={handleCloseClick}>X</Button>
           <LeftBox>
             <Profile
-              profileUrl={
-                actor.profile_path
-                  ? `https://image.tmdb.org/t/p/w400${actor.profile_path}`
-                  : require('../assets/no_poster.png')
-              }
-              isExisted={actor.profile_path && true}
+              profileUrl={actor.profile_path ? `https://image.tmdb.org/t/p/w400${actor.profile_path}` : noPosterImage}
+              isExisted={!!actor.profile_path}
             />
           </LeftBox>
           <RightBox>

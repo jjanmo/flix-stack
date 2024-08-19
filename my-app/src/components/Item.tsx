@@ -82,7 +82,7 @@ const Container = styled.div`
 `;
 
 interface Props {
-  id: number;
+  id: string;
   title: string;
   poster: string;
   rating: number;

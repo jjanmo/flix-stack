@@ -1,16 +1,18 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { movieApi } from 'api';
+import { useEffect, useState, useCallback } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { movieApi } from '@/apis';
 import styled from 'styled-components';
-import Loader from 'components/Loader';
-import HelmetTitle from 'components/HelmetTitle';
-import Stars from 'components/Stars';
+import Loader from '@/components/Loader';
+import HelmetTitle from '@/components/HelmetTitle';
+import Stars from '@/components/Stars';
+import noPosterImage from '@/assets/no_poster.png';
+import { Collection as CollectionType } from '@/types';
 
 const Container = styled.div`
   padding: 0 5rem;
 `;
-const Background = styled.div`
-  background-image: url(${props => props.backdropUrl});
+const Background = styled.div<{ backdropUrl: string }>`
+  background-image: url(${(props) => props.backdropUrl});
   background-position: center center;
   background-repeat: repeat;
   background-size: cover;
@@ -43,8 +45,8 @@ const List = styled.ul`
   width: 90%;
   overflow: auto;
 `;
-const Poster = styled.div`
-  background-image: url(${props => props.posterUrl});
+const Poster = styled.div<{ posterUrl: string; isExisted: boolean }>`
+  background-image: url(${(props) => props.posterUrl});
   background-position: center center;
   background-repeat: repeat;
   background-size: cover;
@@ -53,7 +55,7 @@ const Poster = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: ${props => (props.isExisted ? 1 : 0.7)};
+  opacity: ${(props) => (props.isExisted ? 1 : 0.7)};
 `;
 const Name = styled.span`
   position: absolute;
@@ -119,35 +121,31 @@ const Button = styled.button`
   }
 `;
 
-const Collection = ({ history, match }) => {
-  const [collection, setCollection] = useState({});
+const Collection = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
+  const [collection, setCollection] = useState<CollectionType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const fetchData = useCallback(async () => {
-    const id = match.params.id;
     setIsLoading(true);
 
     try {
-      const { data } = await movieApi.getCollection(id);
+      const { data } = await movieApi.getCollection(Number(id));
       setCollection(data);
-      console.log(data);
-    } catch (error) {
-      setError(error);
     } finally {
       setIsLoading(false);
     }
-  }, [match]);
+  }, [id]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const handleBackClick = () => {
-    history.goBack();
+    navigate(-1);
   };
-
-  if (error) return <div>{JSON.stringify(error)}</div>;
 
   return isLoading ? (
     <>
@@ -156,27 +154,24 @@ const Collection = ({ history, match }) => {
     </>
   ) : (
     <Container>
-      {/* <HelmetTitle text={'Dark Night'} /> */}
       <Background
-        backdropUrl={collection.backdrop_path ? `https://image.tmdb.org/t/p/w1280/${collection.backdrop_path}` : ''}
+        backdropUrl={collection?.backdrop_path ? `https://image.tmdb.org/t/p/w1280/${collection.backdrop_path}` : ''}
       />
       <Title>
-        {collection.name}
+        {collection?.name}
         <Button onClick={handleBackClick}>back</Button>
       </Title>
-      <Overview>{collection.overview}</Overview>
+      <Overview>{collection?.overview}</Overview>
       <List>
-        {collection.parts &&
-          collection.parts.map((movie, index) => (
+        {collection?.parts &&
+          collection?.parts.map((movie, index) => (
             <Link to={`/movie/${movie.id}`} key={index}>
               <Item>
                 <Poster
                   posterUrl={
-                    movie.backdrop_path
-                      ? `https://image.tmdb.org/t/p/w400${movie.backdrop_path}`
-                      : require('../assets/no_poster.png')
+                    movie.backdrop_path ? `https://image.tmdb.org/t/p/w400${movie.backdrop_path}` : noPosterImage
                   }
-                  isExisted={movie.backdrop_path && true}
+                  isExisted={!!movie.backdrop_path}
                 />
                 <Name>{movie.title}</Name>
                 <Year>{movie.release_date || 'Not Updated'}</Year>

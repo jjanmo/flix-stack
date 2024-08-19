@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { tvApi } from 'api';
+import { useEffect, useState } from 'react';
+import { tvApi } from '@/apis';
 import styled from 'styled-components';
-import HelmetTitle from 'components/HelmetTitle';
-import Section from 'components/Section';
-import Item from 'components/Item';
-import Loader from 'components/Loader';
+import HelmetTitle from '@/components/HelmetTitle';
+import Section from '@/components/Section';
+import Item from '@/components/Item';
+import Loader from '@/components/Loader';
+import { TV as TVType } from '@/types';
 
 const Container = styled.div``;
 
-const TV = () => {
-  const [popular, setPopular] = useState([]);
-  const [topRated, setTopRated] = useState([]);
-  const [onTheAir, setOnTheAir] = useState([]);
+export default function TV() {
+  const [popular, setPopular] = useState<TVType[]>([]);
+  const [topRated, setTopRated] = useState<TVType[]>([]);
+  const [onTheAir, setOnTheAir] = useState<TVType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -31,8 +31,6 @@ const TV = () => {
       setPopular(_popular);
       setTopRated(_topRated);
       setOnTheAir(_onTheAir);
-    } catch (error) {
-      setError(error);
     } finally {
       setIsLoading(false);
     }
@@ -41,8 +39,6 @@ const TV = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  if (error) return <div>{JSON.stringify(error)}</div>;
 
   return isLoading ? (
     <>
@@ -53,7 +49,7 @@ const TV = () => {
     <Container>
       {popular && popular.length > 0 && (
         <Section title="Popular TVs">
-          {popular.map(tv => (
+          {popular.map((tv) => (
             <Item
               key={tv.id}
               id={tv.id}
@@ -67,7 +63,7 @@ const TV = () => {
       )}
       {topRated && topRated.length > 0 && (
         <Section title="Top Rated TVs">
-          {topRated.map(tv => (
+          {topRated.map((tv) => (
             <Item
               key={tv.id}
               id={tv.id}
@@ -81,7 +77,7 @@ const TV = () => {
       )}
       {onTheAir && onTheAir.length > 0 && (
         <Section title="TVs On The Air 7days">
-          {onTheAir.map(tv => (
+          {onTheAir.map((tv) => (
             <Item
               key={tv.id}
               id={tv.id}
@@ -95,6 +91,4 @@ const TV = () => {
       )}
     </Container>
   );
-};
-
-export default TV;
+}

@@ -1,17 +1,19 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { tvApi } from 'api';
+import { useEffect, useState, useCallback } from 'react';
+import { tvApi } from '@/apis';
 import styled from 'styled-components';
-import HelmetTitle from '../components/HelmetTitle';
-import Loader from '../components/Loader';
-import Episodes from '../components/Episodes';
+import HelmetTitle from '@/components/HelmetTitle';
+import Loader from '@/components/Loader';
+import Episodes from '@/components/Episodes';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Season as SeasonType } from '@/types';
 
 const Container = styled.div`
   width: 80%;
   margin: 0 auto;
   padding: 2rem 1rem;
 `;
-const Background = styled.div`
-  background-image: url(${props => props.backdropUrl});
+const Background = styled.div<{ backdropUrl: string }>`
+  background-image: url(${(props) => props.backdropUrl});
   background-position: center center;
   background-repeat: repeat;
   background-size: cover;
@@ -71,38 +73,33 @@ const Button = styled.button`
 `;
 const EpisodeContainer = styled.div``;
 
-const Season = ({ history, match, location }) => {
+const Season = () => {
+  const { id, season: seasonNumber } = useParams();
+  const navigate = useNavigate();
   const {
-    state: { backdropUrl, name, originalName },
-  } = location;
-  const [season, setSeason] = useState(null);
+    state: { name, originalName, backdropUrl },
+  } = useLocation();
+
+  const [season, setSeason] = useState<SeasonType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleClick = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   const fetchData = useCallback(async () => {
-    const id = match.params.id;
-    const seasonNumber = match.params.season;
     setIsLoading(true);
-
     try {
-      const { data } = await tvApi.getSeason(id, seasonNumber);
+      const { data } = await tvApi.getSeason(Number(id), Number(seasonNumber));
       setSeason(data);
-    } catch (e) {
-      setError(e);
     } finally {
       setIsLoading(false);
     }
-  }, [match]);
+  }, [id, seasonNumber]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  if (error) return <div>{JSON.stringify(error)}</div>;
 
   return isLoading ? (
     <>
@@ -117,11 +114,12 @@ const Season = ({ history, match, location }) => {
           <Background backdropUrl={backdropUrl} />
           <Title>
             <Name>
-              {name}
+              {''}
               <SeasonNumber>{season.season_number === 0 ? 'Specials' : `Season ${season.season_number}`}</SeasonNumber>
               <Button onClick={handleClick}>back</Button>
             </Name>
             <SubTitle>{name && originalName === name ? '' : `( ${originalName} )`}</SubTitle>
+            <SubTitle></SubTitle>
           </Title>
           <Overview>{`${season.overview}` || 'Overview Not Updated'}</Overview>
           <EpisodeContainer>

@@ -2,6 +2,11 @@ export interface Actor {
   id: number;
   name: string;
   profile_path: string;
+  imdb_id: string;
+  birthday?: string;
+  deathday?: string;
+  place_of_birth?: string;
+  biography?: string;
 }
 export interface Episode {
   id: number;
@@ -38,6 +43,7 @@ export interface Movie {
   videos: {
     results: Video[];
   };
+  backdrop_path?: string;
 }
 export interface Video {
   id: string;
@@ -60,6 +66,8 @@ export interface TV {
   };
   poster_path: string;
   genres: Genre[];
+  backdrop_path?: string;
+  imdb_id: string;
 }
 export interface Season {
   air_date: string;
@@ -68,4 +76,12 @@ export interface Season {
   overview: string;
   poster_path: string;
   season_number: number;
+  episodes?: Episode[];
+}
+export interface Collection {
+  id: number;
+  name: string;
+  backdrop_path: string;
+  overview: string;
+  parts: Movie[];
 }

@@ -9,6 +9,6 @@ const routes = {
   SEASONS: '/season/:id',
   ACTOR: '/actor/:id',
   SEASON: '/seasons/:id/:season',
-};
+} as const;
 
 export default routes;

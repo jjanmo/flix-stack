@@ -1,5 +1,5 @@
-import GlobalStyles from './Components/GlobalStyles';
-import Routers from './Routers';
+import GlobalStyles from '@/components/GlobalStyles';
+import Routers from './Router';
 
 function App() {
   return (

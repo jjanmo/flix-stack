@@ -1,4 +1,3 @@
-import React from 'react';
 import { HashRouter as Router, Route, Redirect } from 'react-router-dom';
 import Navigation from 'components/navigation';
 import Home from 'pages/Home';

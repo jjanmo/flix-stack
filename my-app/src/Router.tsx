@@ -1,4 +1,4 @@
-import { HashRouter as Router, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Route, Navigate, Routes } from 'react-router-dom';
 import Navigation from '@/components/navigation';
 import Home from '@/pages/Home';
 import Movie from '@/pages/Movie';
@@ -15,17 +15,19 @@ function AppRouter() {
   return (
     <Router>
       <Navigation />
-      <Route path={ROUTES.HOME} element={<Home />} />
-      <Route path={ROUTES.MOVIES} element={<Movie />} />
-      <Route path={ROUTES.MOVIE_DETAIL} element={<Detail />} />
-      <Route path={ROUTES.TVS} element={<TV />} />
-      <Route path={ROUTES.TV_DETAIL} element={<Detail />} />
-      <Route path={ROUTES.SEARCH} element={<Search />} />
-      <Route path={ROUTES.COLLECTION} element={<Collection />} />
-      <Route path={ROUTES.SEASONS} element={<Seasons />} />
-      <Route path={ROUTES.ACTOR} element={<Actor />} />
-      <Route path={ROUTES.SEASON} element={<Season />} />
-      <Route path="*" element={<Navigate replace to="/" />} />
+      <Routes>
+        <Route path={ROUTES.HOME} element={<Home />} />
+        <Route path={ROUTES.MOVIES} element={<Movie />} />
+        <Route path={ROUTES.MOVIE_DETAIL} element={<Detail />} />
+        <Route path={ROUTES.TVS} element={<TV />} />
+        <Route path={ROUTES.TV_DETAIL} element={<Detail />} />
+        <Route path={ROUTES.SEARCH} element={<Search />} />
+        <Route path={ROUTES.COLLECTION} element={<Collection />} />
+        <Route path={ROUTES.SEASONS} element={<Seasons />} />
+        <Route path={ROUTES.ACTOR} element={<Actor />} />
+        <Route path={ROUTES.SEASON} element={<Season />} />
+        <Route path="*" element={<Navigate replace to="/" />} />
+      </Routes>
     </Router>
   );
 }
